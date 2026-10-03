@@ -59,6 +59,13 @@ Curtain 的规则指令与 Fabric Carpet **不同**，不是 `/carpet <规则> <
 /curtain setDefault <规则> <值> # 设为默认（写入存档）
 ```
 
+例如，允许打开假人背包：
+
+```
+/curtain setDefault openFakePlayerInventory true   # 永久生效（写入配置）
+/curtain setValue   openFakePlayerInventory true   # 仅本次会话
+```
+
 GCA 的规则分类标签为 **`GCA`**，另有 `Experimental` 分类。
 
 ## 功能一览（GCA 独有部分）
@@ -192,6 +199,13 @@ GCA is a server-side addon for Carpet. On Forge, the equivalent core is [**Curta
 ### Rules command
 
 Curtain uses `/curtain setValue <rule> <value>` and `/curtain setDefault <rule> <value>` (not `/carpet ...`). GCA rules live under the `GCA` category.
+
+For example, to allow opening a fake player's inventory:
+
+```
+/curtain setDefault openFakePlayerInventory true   # permanent (saved to config)
+/curtain setValue   openFakePlayerInventory true   # current session only
+```
 
 ### Features
 
