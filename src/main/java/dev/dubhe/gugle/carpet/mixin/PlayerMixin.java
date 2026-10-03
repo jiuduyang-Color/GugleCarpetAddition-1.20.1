@@ -1,0 +1,124 @@
+package dev.dubhe.gugle.carpet.mixin;
+
+import carpet.patches.EntityPlayerMPFake;
+import carpet.utils.CommandHelper;
+import dev.dubhe.gugle.carpet.GcaSetting;
+import dev.dubhe.gugle.carpet.api.tools.text.ComponentHelper;
+import dev.dubhe.gugle.carpet.tools.player.IClientMenuTick;
+import dev.dubhe.gugle.carpet.tools.player.IGcaPlayer;
+import dev.dubhe.gugle.carpet.tools.player.PlayerInventoryMenu;
+import dev.dubhe.gugle.carpet.util.ClientUtil;
+import dev.dubhe.gugle.carpet.util.SettingUtil;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ChestMenu;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+@Mixin(Player.class)
+abstract class PlayerMixin {
+    @Unique
+    private final Player gca$self = (Player) (Object) this;
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tick(CallbackInfo ci) {
+        if (this.gca$self.isAlive() && this.gca$self instanceof IGcaPlayer gcaPlayer) {
+            gcaPlayer.getEnderChestContainer().tick();
+            gcaPlayer.getInventoryContainer().tick();
+        }
+        if (this.gca$self.level().isClientSide() && this.gca$self.containerMenu instanceof IClientMenuTick tick) {
+            tick.tick();
+        }
+    }
+
+    @WrapOperation(
+        method = "interactOn",
+        at = @At(
+            value = "INVOKE",
+            target =
+                "Lnet/minecraft/world/entity/Entity;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"
+        )
+    )
+    private InteractionResult interactOn(
+        Entity entity, Player player, InteractionHand hand,
+        Operation<InteractionResult> original
+    ) {
+        if (player.level().isClientSide()) {
+
+            if (entity instanceof Player otherPlayer && ClientUtil.isFakePlayer(otherPlayer)) {
+                return InteractionResult.CONSUME;
+            }
+        } else if (player instanceof ServerPlayer serverPlayer && entity instanceof ServerPlayer otherPlayer) {
+            InteractionResult result = this.openInventory(serverPlayer, otherPlayer);
+            if (result != InteractionResult.PASS) {
+                player.stopUsingItem();
+                return result;
+            }
+        }
+        return original.call(entity, player, hand
+        );
+    }
+
+    @Unique
+    private InteractionResult openInventory(ServerPlayer player, ServerPlayer otherPlayer) {
+        if (!(otherPlayer instanceof IGcaPlayer gcaPlayer)) return InteractionResult.PASS;
+
+        SimpleMenuProvider provider = null;
+        boolean isFakePlayer = otherPlayer instanceof EntityPlayerMPFake;
+        boolean canOperateRealPlayer = !isFakePlayer && gca$canOperateRealPlayer(player);
+        boolean canOperate = isFakePlayer || canOperateRealPlayer;
+        boolean canOpenInventory = canOperateRealPlayer || (isFakePlayer && GcaSetting.openFakePlayerInventory);
+
+        if (canOperate && player.isShiftKeyDown()) {
+
+            if (SettingUtil.openFakePlayerEnderChest(player)) {
+                provider = new SimpleMenuProvider(
+                    (i, inventory, p) -> ChestMenu.sixRows(
+                        i, inventory,
+                        gcaPlayer.getEnderChestContainer().selfUpdate()
+                    ),
+                    ComponentHelper.tr("gca.player.ender_chest", otherPlayer.getDisplayName())
+                );
+            } else if (canOpenInventory) {
+
+                provider = new SimpleMenuProvider(
+                    (i, inventory, p) -> ChestMenu.threeRows(
+                        i, inventory,
+                        gcaPlayer.getEnderChestContainer().selfUpdate()
+                    ),
+                    ComponentHelper.tr("gca.player.other_controller", otherPlayer.getDisplayName())
+                );
+            }
+        } else if (canOpenInventory) {
+
+            provider = new SimpleMenuProvider(
+                (i, inventory, p) -> new PlayerInventoryMenu(
+                    i, inventory,
+                    gcaPlayer.getInventoryContainer().selfUpdate()
+                ),
+                ComponentHelper.tr("gca.player.inventory", otherPlayer.getDisplayName())
+            );
+        }
+
+        if (provider == null) return InteractionResult.PASS;
+
+        player.openMenu(provider);
+        return InteractionResult.CONSUME;
+    }
+
+    @Unique
+    private static boolean gca$canOperateRealPlayer(ServerPlayer player) {
+        CommandSourceStack stack = player.createCommandSourceStack();
+        return CommandHelper.canUseCommand(stack, GcaSetting.openRealPlayerInventory);
+    }
+}

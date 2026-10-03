@@ -1,0 +1,100 @@
+package dev.dubhe.gugle.carpet.api.menu.control;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+public class Button {
+    public static final String GCA_CLEAR = "GcaClear";
+    public static final String GCA_BUTTON = "GcaButton";
+    private final Container container;
+    private final int slot;
+    private final ItemStack onItem;
+    private final ItemStack offItem;
+    private final List<Consumer<Button>> turnOnCallback;
+    private final List<Consumer<Button>> turnOffCallback;
+    private boolean status;
+    private boolean executing;
+
+    public Button(
+        Container container, int slot,
+        ItemStack on, ItemStack off,
+        List<Consumer<Button>> turnOnCallback,
+        List<Consumer<Button>> turnOffCallback,
+        boolean status
+    ) {
+        this.container = container;
+        this.slot = slot;
+        this.onItem = on;
+        this.offItem = off;
+        this.turnOnCallback = turnOnCallback;
+        this.turnOffCallback = turnOffCallback;
+        this.status = status;
+        this.init();
+    }
+
+    private void init() {
+        this.appendGCAMark(this.onItem);
+        this.appendGCAMark(this.offItem);
+        ItemStack slotItem = this.status ? this.onItem.copy() : this.offItem.copy();
+        this.container.setItem(this.slot, slotItem);
+    }
+
+    private void appendGCAMark(ItemStack item) {
+        CompoundTag compound = item.getOrCreateTag();
+        compound.putBoolean(GCA_CLEAR, true);
+        compound.putInt(GCA_BUTTON, this.slot);
+    }
+
+    public void refresh() {
+        ItemStack slotItem = this.status ? this.onItem.copy() : this.offItem.copy();
+        this.container.setItem(this.slot, slotItem);
+    }
+
+    public boolean getStatus() {
+        return this.status;
+    }
+
+    public boolean isExecuting() {
+        return this.executing;
+    }
+
+    public boolean clicked() {
+        return this.container.getItem(this.slot).isEmpty();
+    }
+
+    public void clickCallback() {
+        this.status = !this.status;
+        this.callback();
+    }
+
+    public void changeStatus(boolean status) {
+        this.changeStatus(status, false);
+    }
+
+    public void changeStatus(boolean status, boolean passExecute) {
+        this.status = status;
+        if (passExecute) return;
+        this.callback();
+    }
+
+    public void softChangeStatus(boolean status) {
+        if (this.executing) return;
+        this.status = status;
+    }
+
+    public void callback() {
+        List<Consumer<Button>> callbacks = this.status ? this.turnOnCallback : this.turnOffCallback;
+        this.executing = true;
+        try {
+            for (Consumer<Button> callback : callbacks) {
+                callback.accept(this);
+            }
+        } finally {
+            this.executing = false;
+        }
+    }
+}

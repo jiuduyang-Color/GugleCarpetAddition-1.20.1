@@ -1,0 +1,88 @@
+package dev.dubhe.gugle.carpet.tools.player;
+
+import carpet.fakes.ServerPlayerInterface;
+import carpet.helpers.EntityPlayerActionPack;
+import dev.dubhe.gugle.carpet.api.menu.CustomMenu;
+import net.minecraft.core.NonNullList;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nullable;
+import java.util.Map;
+
+public abstract class PlayerContainer extends CustomMenu {
+    protected final ServerPlayer player;
+    protected final EntityPlayerActionPack ap;
+
+    public PlayerContainer(ServerPlayer player) {
+        this.player = player;
+        this.ap = ((ServerPlayerInterface) this.player).getActionPack();
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        Map.Entry<NonNullList<ItemStack>, Integer> pair = getItemSlot(slot);
+        if (pair != null) {
+            return pair.getKey().get(pair.getValue());
+        } else {
+            return ItemStack.EMPTY;
+        }
+    }
+
+    @Nullable
+    public abstract Map.Entry<NonNullList<ItemStack>, Integer> getItemSlot(int slot);
+
+    @Override
+    public ItemStack removeItem(int slot, int amount) {
+        Map.Entry<NonNullList<ItemStack>, Integer> pair = getItemSlot(slot);
+        NonNullList<ItemStack> list = null;
+        if (pair != null) {
+            list = pair.getKey();
+            slot = pair.getValue();
+        }
+        if (list != null && !list.get(slot).isEmpty()) {
+            return ContainerHelper.removeItem(list, slot, amount);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        Map.Entry<NonNullList<ItemStack>, Integer> pair = getItemSlot(slot);
+        NonNullList<ItemStack> list = null;
+        if (pair != null) {
+            list = pair.getKey();
+            slot = pair.getValue();
+        }
+        if (list != null && !list.get(slot).isEmpty()) {
+            ItemStack itemStack = list.get(slot);
+            list.set(slot, ItemStack.EMPTY);
+            return itemStack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        Map.Entry<NonNullList<ItemStack>, Integer> pair = getItemSlot(slot);
+        NonNullList<ItemStack> list = null;
+        if (pair != null) {
+            list = pair.getKey();
+            slot = pair.getValue();
+        }
+        if (list != null) {
+            list.set(slot, stack);
+        }
+    }
+
+    @Override
+    public void setChanged() {
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return this.player.isAlive() && player.distanceToSqr(this.player) <= 64.0;
+    }
+}
