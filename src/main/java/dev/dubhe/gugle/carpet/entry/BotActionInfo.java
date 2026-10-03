@@ -1,7 +1,7 @@
 package dev.dubhe.gugle.carpet.entry;
 
-import carpet.fakes.ServerPlayerInterface;
-import carpet.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.fakes.IServerPlayer;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.dubhe.gugle.carpet.mixin.APAccessor;
@@ -46,7 +46,7 @@ public record BotActionInfo(
     }
 
     public void applyAction(ServerPlayer player, @Nullable EntityPlayerActionPack actionPack) {
-        EntityPlayerActionPack ap = ((ServerPlayerInterface) player).getActionPack();
+        EntityPlayerActionPack ap = ((IServerPlayer) player).getActionPack();
         IFakePlayerAction action = actionPack == null ? this : IFakePlayerAction.of(actionPack);
         ap.setSneaking(action.getSneaking());
         ap.setSprinting(action.getSprinting());

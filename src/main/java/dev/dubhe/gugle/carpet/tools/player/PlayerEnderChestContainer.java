@@ -1,8 +1,8 @@
 package dev.dubhe.gugle.carpet.tools.player;
 
-import carpet.helpers.EntityPlayerActionPack;
-import carpet.patches.EntityPlayerMPFake;
-import carpet.utils.Messenger;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.patches.EntityPlayerMPFake;
+import dev.dubhe.curtain.utils.Messenger;
 import com.google.common.collect.ImmutableList;
 import dev.dubhe.gugle.carpet.api.menu.control.ButtonBuilder;
 import dev.dubhe.gugle.carpet.api.tools.text.Color;

@@ -1,7 +1,7 @@
 package dev.dubhe.gugle.carpet.tools.player;
 
-import carpet.fakes.ServerPlayerInterface;
-import carpet.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.fakes.IServerPlayer;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
 import dev.dubhe.gugle.carpet.api.menu.CustomMenu;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,7 +18,7 @@ public abstract class PlayerContainer extends CustomMenu {
 
     public PlayerContainer(ServerPlayer player) {
         this.player = player;
-        this.ap = ((ServerPlayerInterface) this.player).getActionPack();
+        this.ap = ((IServerPlayer) this.player).getActionPack();
     }
 
     @Override

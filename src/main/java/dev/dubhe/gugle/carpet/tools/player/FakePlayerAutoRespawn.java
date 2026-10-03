@@ -1,8 +1,8 @@
 package dev.dubhe.gugle.carpet.tools.player;
 
-import carpet.fakes.ServerPlayerInterface;
-import carpet.helpers.EntityPlayerActionPack;
-import carpet.patches.EntityPlayerMPFake;
+import dev.dubhe.curtain.features.player.fakes.IServerPlayer;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.patches.EntityPlayerMPFake;
 import com.mojang.authlib.GameProfile;
 import dev.dubhe.gugle.carpet.GcaSetting;
 import dev.dubhe.gugle.carpet.commands.BotCommand;
@@ -47,7 +47,7 @@ public class FakePlayerAutoRespawn {
         EntityPlayerActionPack pack = cachedDiedFakePlayers.remove(player.getUUID());
         if (pack == null || "false".equals(GcaSetting.fakePlayerAutoRespawn)) return;
 
-        EntityPlayerActionPack actionPack = ((ServerPlayerInterface) player).getActionPack();
+        EntityPlayerActionPack actionPack = ((IServerPlayer) player).getActionPack();
         MinecraftServer server = player.server;
         GameProfile profile = player.getGameProfile();
         String name = profile.getName();
@@ -55,7 +55,7 @@ public class FakePlayerAutoRespawn {
         BotInfo respawnBot = getRespawnBotInfo(player, server, name);
 
         server.tell(new TickTask(server.getTickCount() + 1, () -> {
-            BotSpawnUtil.spawnBot(server, null, respawnBot, profile, GcaSetting.fakePlayerReloadAction, actionPack);
+            BotSpawnUtil.spawnBot(server, respawnBot, true, actionPack);
         }));
     }
 

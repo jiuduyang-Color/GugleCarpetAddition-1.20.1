@@ -1,225 +1,165 @@
 package dev.dubhe.gugle.carpet;
 
-import carpet.api.settings.Rule;
-import carpet.api.settings.Validators;
+import dev.dubhe.curtain.api.rules.Rule;
+import dev.dubhe.curtain.api.rules.Validators;
+
+import static dev.dubhe.curtain.api.rules.Categories.BOT;
+import static dev.dubhe.curtain.api.rules.Categories.COMMAND;
 
 public class GcaSetting {
 
     public static final String GCA = "GCA";
     public static final String EXPERIMENTAL = "experimental";
-    public static final String BOT = "BOT";
-    public static final String COMMAND = "command";
 
     @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean openFakePlayerInventory = false;
-
-    @Rule(
-        options = {"true", "false", "ops", "0", "1", "2", "3", "4"},
-        categories = {GCA, EXPERIMENTAL},
-        validators = Validators.CommandLevel.class
+        categories = {GCA, BOT, EXPERIMENTAL},
+        suggestions = {"true", "false", "ops", "0", "1", "2", "3", "4"},
+        validators = Validators.CommandLevel.class,
+        serializedName = "openRealPlayerInventory"
     )
     public static String openRealPlayerInventory = "false";
 
     @Rule(
-        categories = {GCA, BOT},
-        options = {"ender_chest", "true", "false"},
-        validators = GcaValidators.EnderChest.class
-    )
-    public static String openFakePlayerEnderChest = "false";
-
-    @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerResident = false;
-
-    @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerReloadAction = true;
-
-    @Rule(
         categories = {GCA, BOT, EXPERIMENTAL},
-        options = {"spawn", "death", "setting", "false"}
+        suggestions = {"spawn", "death", "setting", "false"},
+        serializedName = "fakePlayerAutoRespawn"
     )
     public static String fakePlayerAutoRespawn = "false";
 
     @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerAutoReplenishment = false;
-
-    @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerAutoReplenishmentFormShulkerBox = false;
-
-    @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerAutoFish = false;
-
-    @Rule(
-        options = {"false", "true", "keep"},
-        categories = {GCA, BOT}
-    )
-    public static String fakePlayerAutoReplaceTool = "false";
-
-    @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerToolDamagedNotification = false;
-
-    public static final String fakePlayerNoneName = "#none";
-
-    @Rule(
-        options = {fakePlayerNoneName, "bot_"},
-        categories = {GCA, BOT}
-    )
-    public static String fakePlayerPrefixName = fakePlayerNoneName;
-
-    @Rule(
-        options = {fakePlayerNoneName, "_fake"},
-        categories = {GCA, BOT}
-    )
-    public static String fakePlayerSuffixName = fakePlayerNoneName;
-
-    @Rule(
-        categories = {GCA, BOT}
-    )
-    public static boolean fakePlayerForceOfflineUUID = false;
-
-    @Rule(
         categories = {GCA, BOT, COMMAND},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"}
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandBot"
     )
     public static String commandBot = "ops";
 
     @Rule(
         categories = {GCA, BOT, COMMAND},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"}
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandBotAction"
     )
     public static String commandBotAction = "ops";
 
     @Rule(
         categories = {GCA, BOT, COMMAND, EXPERIMENTAL},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"}
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandBotController"
     )
     public static String commandBotController = "ops";
 
     @Rule(
         categories = {GCA, COMMAND},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"}
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandTodo"
     )
     public static String commandTodo = "ops";
 
     @Rule(
         categories = {GCA, COMMAND},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"},
-        conditions = GcaValidators.CarpetAmsAdditionLoaded.class
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandHere"
     )
     public static String commandHere = "ops";
 
     @Rule(
         categories = {GCA, COMMAND},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"}
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandWhereis"
     )
     public static String commandWhereis = "ops";
 
     @Rule(
         categories = {GCA, COMMAND},
-        options = {"ops", "0", "1", "2", "3", "4", "true", "false"}
+        suggestions = {"ops", "0", "1", "2", "3", "4", "true", "false"},
+        serializedName = "commandLoc"
     )
     public static String commandLoc = "ops";
 
     @Rule(
-        categories = {GCA, COMMAND}
+        categories = {GCA, COMMAND},
+        serializedName = "commandWlist"
     )
     public static boolean commandWlist = false;
 
     @Rule(
-        categories = {GCA, COMMAND}
+        categories = {GCA, COMMAND},
+        serializedName = "commandBlist"
     )
     public static boolean commandBlist = false;
 
     @Rule(
-        categories = {GCA, COMMAND}
+        categories = {GCA, COMMAND},
+        serializedName = "commandSop"
     )
     public static boolean commandSop = false;
 
     @Rule(
-        categories = {GCA}
-    )
-    public static boolean betterFenceGatePlacement = false;
-
-    @Rule(
-        categories = {GCA}
-    )
-    public static boolean betterWoodStrip = false;
-
-    @Rule(
-        categories = {GCA}
-    )
-    public static boolean betterSignInteraction = false;
-
-    @Rule(
-        categories = {GCA}
-    )
-    public static boolean betterItemFrameInteraction = false;
-
-    @Rule(
-        categories = {GCA, EXPERIMENTAL}
-    )
-    public static boolean betterQuickCrafting = false;
-
-    @Rule(
-        categories = {GCA}
-    )
-    public static boolean simpleInGameCalculator = false;
-
-    @Rule(
-        categories = {GCA}
-    )
-    public static boolean fastPingFriend = false;
-
-    @Rule(
-        categories = {GCA, EXPERIMENTAL}
-    )
-    public static int qnmdLC = -1;
-
-    @Rule(
-        categories = {GCA, EXPERIMENTAL}
-    )
-    public static boolean fixedEndCrystalSync = false;
-
-    @Rule(
-        categories = {GCA}
-    )
-    public static boolean welcomePlayer = false;
-
-    @Rule(
-        categories = {GCA, EXPERIMENTAL}
-    )
-    public static boolean wanderingTraderSpawnFailedWarning = false;
-
-    @Rule(
-        categories = {GCA, EXPERIMENTAL}
-    )
-    public static boolean wanderingTraderSpawnRemind = false;
-
-    @Rule(
-        options = {"vanilla", "true", "false", "ops", "0", "1", "2", "3", "4"},
-        categories = {GCA, COMMAND},
-        validators = GcaValidators.CommandLevelWithVanilla.class
+        categories = {GCA},
+        suggestions = {"vanilla", "true", "false", "ops", "0", "1", "2", "3", "4"},
+        validators = GcaValidators.CommandLevelWithVanilla.class,
+        serializedName = "commandSeed"
     )
     public static String commandSeed = "vanilla";
 
     @Rule(
         categories = {GCA},
+        serializedName = "betterItemFrameInteraction"
+    )
+    public static boolean betterItemFrameInteraction = false;
+
+    @Rule(
+        categories = {GCA, EXPERIMENTAL},
+        serializedName = "betterQuickCrafting"
+    )
+    public static boolean betterQuickCrafting = false;
+
+    @Rule(
+        categories = {GCA},
+        serializedName = "simpleInGameCalculator"
+    )
+    public static boolean simpleInGameCalculator = false;
+
+    @Rule(
+        categories = {GCA},
+        serializedName = "fastPingFriend"
+    )
+    public static boolean fastPingFriend = false;
+
+    @Rule(
+        categories = {GCA, EXPERIMENTAL},
+        serializedName = "qnmdLC"
+    )
+    public static int qnmdLC = -1;
+
+    @Rule(
+        categories = {GCA, EXPERIMENTAL},
+        serializedName = "fixedEndCrystalSync"
+    )
+    public static boolean fixedEndCrystalSync = false;
+
+    @Rule(
+        categories = {GCA},
+        serializedName = "welcomePlayer"
+    )
+    public static boolean welcomePlayer = false;
+
+    @Rule(
+        categories = {GCA, EXPERIMENTAL},
+        serializedName = "wanderingTraderSpawnFailedWarning"
+    )
+    public static boolean wanderingTraderSpawnFailedWarning = false;
+
+    @Rule(
+        categories = {GCA, EXPERIMENTAL},
+        serializedName = "wanderingTraderSpawnRemind"
+    )
+    public static boolean wanderingTraderSpawnRemind = false;
+
+    @Rule(
+        categories = {GCA},
         validators = GcaValidators.PositiveNumber.class,
-        options = {"8"},
-        strict = false
+        suggestions = {"8"},
+        serializedName = "gcaPageSize"
     )
     public static int gcaPageSize = 8;
 

@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.mixin;
 
-import carpet.utils.CommandHelper;
+import dev.dubhe.curtain.utils.CommandHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.brigadier.builder.ArgumentBuilder;

@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.entry;
 
-import carpet.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
 import dev.dubhe.gugle.carpet.mixin.APAccessor;
 
 public interface IFakePlayerAction {

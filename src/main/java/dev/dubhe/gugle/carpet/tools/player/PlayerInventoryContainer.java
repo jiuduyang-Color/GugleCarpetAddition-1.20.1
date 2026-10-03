@@ -1,7 +1,7 @@
 package dev.dubhe.gugle.carpet.tools.player;
 
-import carpet.helpers.EntityPlayerActionPack.Action;
-import carpet.helpers.EntityPlayerActionPack.ActionType;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack.Action;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack.ActionType;
 import com.google.common.collect.ImmutableList;
 import dev.dubhe.gugle.carpet.api.menu.control.ButtonBuilder;
 import dev.dubhe.gugle.carpet.api.menu.control.Button;

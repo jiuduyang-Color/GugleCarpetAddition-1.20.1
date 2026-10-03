@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.mixin;
 
-import carpet.patches.EntityPlayerMPFake;
+import dev.dubhe.curtain.features.player.patches.EntityPlayerMPFake;
 import dev.dubhe.gugle.carpet.tools.player.FakePlayerAutoRespawn;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;

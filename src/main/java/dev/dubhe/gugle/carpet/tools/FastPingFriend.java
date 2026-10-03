@@ -39,7 +39,7 @@ public class FastPingFriend {
 
     public static Component getMessage(ServerPlayer player) {
         MutableComponent playerName = Component.empty().append(player.getDisplayName()).withStyle(ChatFormatting.GOLD);
-        return ComponentHelper.tr("carpet.rule.fastPingFriend.msg", Color.AQUA, playerName);
+        return ComponentHelper.tr("curtain.rules.fastPingFriend.msg", Color.AQUA, playerName);
     }
 
     public static void playSound(SoundEvent event, ServerPlayer player) {

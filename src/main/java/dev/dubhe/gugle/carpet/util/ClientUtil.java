@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.util;
 
-import carpet.patches.EntityPlayerMPFake;
+import dev.dubhe.curtain.features.player.patches.EntityPlayerMPFake;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.world.entity.player.Player;

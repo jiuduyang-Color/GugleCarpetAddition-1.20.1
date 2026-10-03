@@ -1,7 +1,7 @@
 package dev.dubhe.gugle.carpet.entry;
 
-import carpet.fakes.ServerPlayerInterface;
-import carpet.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.fakes.IServerPlayer;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.dubhe.gugle.carpet.config.IConfigNode;
@@ -57,7 +57,7 @@ public record BotInfo(
 
     public static BotInfo create(ServerPlayer player, String desc, boolean saveAction) {
         String name = player.getGameProfile().getName();
-        EntityPlayerActionPack actionPack = saveAction ? ((ServerPlayerInterface) player).getActionPack() : null;
+        EntityPlayerActionPack actionPack = saveAction ? ((IServerPlayer) player).getActionPack() : null;
         return BotInfo.create(name, desc, player, actionPack);
     }
 

@@ -1,8 +1,8 @@
 package dev.dubhe.gugle.carpet.commands;
 
-import carpet.fakes.ServerPlayerInterface;
-import carpet.patches.EntityPlayerMPFake;
-import carpet.utils.CommandHelper;
+import dev.dubhe.curtain.features.player.fakes.IServerPlayer;
+import dev.dubhe.curtain.features.player.patches.EntityPlayerMPFake;
+import dev.dubhe.curtain.utils.CommandHelper;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -234,9 +234,12 @@ public class BotCommand {
 
     private static ArgumentBuilder<CommandSourceStack, ?> carpetActionLoop(CommandDispatcher<CommandSourceStack> dispatcher, Command<CommandSourceStack> execute) {
         ArgumentBuilder<CommandSourceStack, ?> node = argument("desc", StringArgumentType.string());
-        CommandNode<CommandSourceStack> playerOperateNode = dispatcher.getRoot()
-            .getChild("player")
-            .getChild("player");
+        CommandNode<CommandSourceStack> playerNode = dispatcher.getRoot().getChild("player");
+        CommandNode<CommandSourceStack> playerOperateNode = playerNode == null ? null : playerNode.getChild("player");
+        if (playerOperateNode == null) {
+            node.then(argument("action", StringArgumentType.greedyString()).executes(execute));
+            return node;
+        }
         loopCommand(node, playerOperateNode, execute);
         return node;
     }
@@ -350,7 +353,7 @@ public class BotCommand {
             name,
             StringArgumentType.getString(context, "desc"),
             player,
-            ((ServerPlayerInterface) player).getActionPack()
+            ((IServerPlayer) player).getActionPack()
         ));
         source.sendSuccess(() -> fmtTr("msg.gca.bot.add.success", name), false);
         return Command.SINGLE_SUCCESS;

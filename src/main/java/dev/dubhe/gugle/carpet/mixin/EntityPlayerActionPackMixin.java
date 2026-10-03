@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.mixin;
 
-import carpet.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
 import dev.dubhe.gugle.carpet.tools.player.IGcaPlayer;
 import dev.dubhe.gugle.carpet.tools.player.PlayerInventoryContainer;
 import net.minecraft.server.level.ServerPlayer;

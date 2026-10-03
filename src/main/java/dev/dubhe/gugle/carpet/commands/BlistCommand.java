@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.commands;
 
-import carpet.utils.CommandHelper;
+import dev.dubhe.curtain.utils.CommandHelper;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;

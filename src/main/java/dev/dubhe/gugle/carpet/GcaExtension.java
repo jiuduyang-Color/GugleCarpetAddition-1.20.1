@@ -1,8 +1,9 @@
 package dev.dubhe.gugle.carpet;
 
-import carpet.CarpetExtension;
-import carpet.CarpetServer;
 import com.mojang.brigadier.CommandDispatcher;
+import dev.dubhe.curtain.Curtain;
+import dev.dubhe.curtain.CurtainRules;
+import dev.dubhe.curtain.ICurtain;
 import dev.dubhe.gugle.carpet.api.tools.text.ComponentHelper;
 import dev.dubhe.gugle.carpet.commands.BlistCommand;
 import dev.dubhe.gugle.carpet.commands.BotCommand;
@@ -15,16 +16,19 @@ import dev.dubhe.gugle.carpet.commands.WlistCommand;
 import dev.dubhe.gugle.carpet.config.GcaConfig;
 import dev.dubhe.gugle.carpet.entry.PlayerGameProfileCache;
 import dev.dubhe.gugle.carpet.tools.WelcomeMessage;
-import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,16 +36,33 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Mod(GcaExtension.MOD_ID)
-public class GcaExtension implements CarpetExtension {
+@Mod.EventBusSubscriber(modid = GcaExtension.MOD_ID)
+public class GcaExtension implements ICurtain {
     public static final String MOD_ID = "gca";
     public static final String MOD_NAME = "GugleCarpetAddition";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
+    public static final List<String> LANGUAGES = List.of("en_us", "zh_cn", "zh_tw");
     public static final HashMap<String, Consumer<ServerPlayer>> ON_PLAYER_LOGGED_IN = new HashMap<>();
     public static final List<Map.Entry<Long, Runnable>> PLAN_FUNCTION = new ArrayList<>();
 
     public GcaExtension() {
-        CarpetServer.manageExtension(this);
+        Curtain.addSubMod(this);
+        this.addRules(GcaSetting.class);
+        this.loadTranslations();
         WelcomeMessage.registerDefaultReplacer();
+    }
+
+    public void loadTranslations() {
+        ClassLoader loader = GcaExtension.class.getClassLoader();
+        for (String lang : LANGUAGES) {
+            InputStream stream = loader.getResourceAsStream("assets/%s/lang/%s.json".formatted(MOD_ID, lang));
+            if (stream == null) continue;
+            try (InputStream input = stream) {
+                this.parseTrans(lang, input);
+            } catch (Exception e) {
+                LOGGER.error("Failed to load translations for {}", lang, e);
+            }
+        }
     }
 
     public static ResourceLocation id(String path) {
@@ -52,26 +73,15 @@ public class GcaExtension implements CarpetExtension {
         return new ResourceLocation(string);
     }
 
-    @Override
-    public void onPlayerLoggedIn(ServerPlayer player) {
-        PlayerGameProfileCache info = PlayerGameProfileCache.of(player);
-        Consumer<ServerPlayer> consumer = ON_PLAYER_LOGGED_IN.remove(info.name());
-        if (consumer != null) consumer.accept(player);
-        if (GcaSetting.welcomePlayer) WelcomeMessage.onPlayerLoggedIn(player);
-    }
-
-    @Override
-    public void onGameStarted() {
-        CarpetServer.settingsManager.parseSettingsClass(GcaSetting.class);
-    }
-
-    @Override
-    public void onServerLoaded(MinecraftServer server) {
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+        MinecraftServer server = event.getServer();
+        ComponentHelper.updateLanguage(CurtainRules.language);
         GcaConfig.CONFIGS.values().forEach(it -> it.tryInit(server));
+        registerCommands(server.getCommands().getDispatcher());
     }
 
-    @Override
-    public void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext) {
+    public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
         BotCommand.register(dispatcher);
         LocCommand.register(dispatcher);
         HereCommand.register(dispatcher);
@@ -82,9 +92,14 @@ public class GcaExtension implements CarpetExtension {
         SopCommand.register(dispatcher);
     }
 
-    @Override
-    public @Nullable Map<String, String> canHasTranslations(String lang) {
-        return ComponentHelper.fetchLanguage(lang);
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ComponentHelper.updateLanguage(CurtainRules.language);
+        PlayerGameProfileCache info = PlayerGameProfileCache.of(player);
+        Consumer<ServerPlayer> consumer = ON_PLAYER_LOGGED_IN.remove(info.name());
+        if (consumer != null) consumer.accept(player);
+        if (GcaSetting.welcomePlayer) WelcomeMessage.onPlayerLoggedIn(player);
     }
 
 }

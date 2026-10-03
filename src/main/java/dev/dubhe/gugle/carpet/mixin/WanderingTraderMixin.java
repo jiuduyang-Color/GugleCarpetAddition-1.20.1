@@ -60,7 +60,7 @@ abstract class WanderingTraderMixin {
         if (result > spawnChance) {
             this.gca$sendMsg(
                 ComponentHelper.tr(
-                    "carpet.rule.wanderingTraderSpawnFailedWarning.tip.02",
+                    "curtain.rules.wanderingTraderSpawnFailedWarning.tip.02",
                     Color.YELLOW,
                     Style.EMPTY,
                     "i <= %s".formatted(spawnChance),
@@ -77,7 +77,7 @@ abstract class WanderingTraderMixin {
         if (result != 0) {
             this.gca$sendMsg(
                 ComponentHelper.tr(
-                    "carpet.rule.wanderingTraderSpawnFailedWarning.tip.02",
+                    "curtain.rules.wanderingTraderSpawnFailedWarning.tip.02",
                     Color.YELLOW,
                     Style.EMPTY,
                     "i == 0",
@@ -98,7 +98,7 @@ abstract class WanderingTraderMixin {
     private void spawn2(ServerLevel serverLevel, CallbackInfoReturnable<Boolean> cir) {
         this.gca$sendMsg(
             ComponentHelper.tr(
-                "carpet.rule.wanderingTraderSpawnFailedWarning.tip.03",
+                "curtain.rules.wanderingTraderSpawnFailedWarning.tip.03",
                 Color.YELLOW,
                 Style.EMPTY,
                 this.gca$player.getDisplayName()
@@ -110,7 +110,7 @@ abstract class WanderingTraderMixin {
     private void spawnSuccess(ServerLevel serverLevel, CallbackInfoReturnable<Boolean> cir) {
         this.gca$sendMsg(
             ComponentHelper.tr(
-                "carpet.rule.wanderingTraderSpawnFailedWarning.tip.04",
+                "curtain.rules.wanderingTraderSpawnFailedWarning.tip.04",
                 Color.YELLOW,
                 Style.EMPTY,
                 this.gca$player.getDisplayName()
@@ -140,7 +140,7 @@ abstract class WanderingTraderMixin {
         Vec3 center = Vec3.atCenterOf(blockPos3);
         this.gca$server.getPlayerList().broadcastSystemMessage(
             ComponentHelper.tr(
-                "carpet.rule.wanderingTraderSpawnRemind.tip",
+                "curtain.rules.wanderingTraderSpawnRemind.tip",
                 Color.YELLOW,
                 Style.EMPTY,
                 Component.literal("[%.1f, %.1f, %.1f]".formatted(center.x, center.y, center.z))
@@ -167,7 +167,7 @@ abstract class WanderingTraderMixin {
         if (this.gca$server == null) return;
         this.gca$server.getPlayerList().broadcastSystemMessage(
             ComponentHelper.tr(
-                "carpet.rule.wanderingTraderSpawnFailedWarning.tip.01",
+                "curtain.rules.wanderingTraderSpawnFailedWarning.tip.01",
                 Color.YELLOW,
                 Style.EMPTY
             ),

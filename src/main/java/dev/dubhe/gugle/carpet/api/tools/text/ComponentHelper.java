@@ -1,6 +1,6 @@
 package dev.dubhe.gugle.carpet.api.tools.text;
 
-import carpet.utils.Translations;
+import dev.dubhe.curtain.utils.TranslationHelper;
 import dev.dubhe.gugle.carpet.GcaExtension;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 
 import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,19 +65,22 @@ public class ComponentHelper {
         return fmt("======== %s ========", content).withStyle(ChatFormatting.GRAY);
     }
 
-    public static void updateLanguage(String lang) {
-        if (en_us.isEmpty()) {
-            String path = String.format("assets/%s/lang/%s.json", GcaExtension.MOD_ID, "en_us");
-            Map<String, String> translations = Translations.getTranslationFromResourcePath(path);
-            en_us.putAll(translations);
+    private static Map<String, String> load(String lang) {
+        String path = String.format("assets/%s/lang/%s.json", GcaExtension.MOD_ID, lang);
+        try (InputStream stream = ComponentHelper.class.getClassLoader().getResourceAsStream(path)) {
+            if (stream == null) return Map.of();
+            return TranslationHelper.getTranslationFromResourcePath(stream);
+        } catch (Exception e) {
+            return Map.of();
         }
+    }
+
+    public static void updateLanguage(String lang) {
+        if (en_us.isEmpty()) en_us.putAll(load("en_us"));
         language.clear();
         language.putAll(en_us);
         ComponentHelper.lang = lang;
-        if (!"en_us".equals(lang)) {
-            String path = String.format("assets/%s/lang/%s.json", GcaExtension.MOD_ID, lang);
-            language.putAll(Translations.getTranslationFromResourcePath(path));
-        }
+        if (!"en_us".equals(lang)) language.putAll(load(lang));
     }
 
     public static Map<String, String> fetchLanguage(String lang) {

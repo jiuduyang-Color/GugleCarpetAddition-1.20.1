@@ -1,56 +1,50 @@
 package dev.dubhe.gugle.carpet.util;
 
-import carpet.helpers.EntityPlayerActionPack;
-import carpet.patches.EntityPlayerMPFake;
-import carpet.patches.FakeClientConnection;
-import com.mojang.authlib.GameProfile;
+import dev.dubhe.curtain.features.player.helpers.EntityPlayerActionPack;
+import dev.dubhe.curtain.features.player.patches.EntityPlayerMPFake;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.dubhe.gugle.carpet.GcaExtension;
 import dev.dubhe.gugle.carpet.entry.BotExecutorInfo;
 import dev.dubhe.gugle.carpet.entry.BotInfo;
-import dev.dubhe.gugle.carpet.mixin.EntityInvoker;
-import dev.dubhe.gugle.carpet.mixin.PlayerAccessor;
-import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class BotSpawnUtil {
     public static boolean spawnBot(MinecraftServer server, BotInfo bot) {
-        return spawnBot(server, bot, true);
+        return spawnBot(server, bot, true, null);
     }
 
-    public static boolean spawnBot(MinecraftServer server, BotInfo bot, boolean applyAction) {
+    public static boolean spawnBot(MinecraftServer server, BotInfo bot, boolean applyAction, @Nullable EntityPlayerActionPack actionPack) {
         ServerLevel level = server.getLevel(bot.dimension());
-        GameProfile gameProfile = GameProfileUtil.getGameProfile(server, bot.name());
-        if (gameProfile == null || level == null) return false;
+        if (level == null) return false;
 
-        return spawnBot(server, level, bot, gameProfile, applyAction, null);
-    }
-
-    public static boolean spawnBot(MinecraftServer server, @Nullable ServerLevel level, BotInfo preBot, GameProfile profile, boolean applyAction, @Nullable EntityPlayerActionPack actionPack) {
-        if (level == null) {
-            level = server.getLevel(preBot.dimension());
-            if (level == null) return false;
+        Vec2 facing = bot.facing() == null ? Vec2.ZERO : bot.facing();
+        Vec3 pos = bot.pos();
+        if (pos == null) {
+            BlockPos spawn = level.getSharedSpawnPos();
+            pos = new Vec3(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D);
         }
 
-        EntityPlayerMPFake instance = EntityPlayerMPFake.respawnFake(server, level, profile);
-        BotInfo bot = preBot.pos() == null ? preBot.withPos(instance.position()) : preBot;
-        instance.fixStartingPosition = () -> instance.moveTo(bot.pos().x, bot.pos().y, bot.pos().z, bot.facing().y, bot.facing().x);
-        server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance);
-        instance.teleportTo(level, bot.pos().x, bot.pos().y, bot.pos().z, bot.facing().y, bot.facing().x);
-        instance.setHealth(20.0F);
-        ((EntityInvoker) instance).invokeUnsetRemoved();
-        instance.setMaxUpStep(0.6F);
-        instance.gameMode.changeGameModeForPlayer(bot.mode());
-        server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(instance, (byte) (instance.yHeadRot * 256 / 360)), bot.dimension());
-        server.getPlayerList().broadcastAll(new ClientboundTeleportEntityPacket(instance), bot.dimension());
-        instance.getEntityData().set(PlayerAccessor.getCustomisationData(), (byte) 0x7f);
-        instance.getAbilities().flying = bot.flying();
+        EntityPlayerMPFake instance = EntityPlayerMPFake.createFakePlayer(
+            bot.name(),
+            server,
+            pos.x,
+            pos.y,
+            pos.z,
+            facing.y,
+            facing.x,
+            bot.dimension(),
+            bot.mode(),
+            bot.flying()
+        );
+        if (instance == null) return false;
+
         if (applyAction) applyAction(server, instance, bot, actionPack);
         return true;
     }
